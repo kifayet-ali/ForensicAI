@@ -37,6 +37,8 @@ class AnomalyAnalyzer:
         # Run detection methods based on log type
         if log_type == 'ssh':
             self._detect_brute_force(sorted_events)
+            self._detect_slow_brute_force(sorted_events)
+            self._detect_distributed_attack(sorted_events)
             self._detect_successful_breach(sorted_events)
             self._detect_off_hours_access(sorted_events)
         elif log_type == 'web':
@@ -74,6 +76,58 @@ class AnomalyAnalyzer:
                     'first_attempt': attempts[0]['raw_timestamp'],
                     'last_attempt': attempts[-1]['raw_timestamp'],
                     'description': f"Brute force attack detected: {len(attempts)} failed login attempts for user '{user}' from IP {ip} within {round(duration, 1)} minutes"
+                })
+    
+    def _detect_slow_brute_force(self, events):
+        """Detect slow brute force (distributed over time to avoid detection)"""
+        failed_attempts = defaultdict(list)
+        
+        for event in events:
+            if event['event_type'] in ['failed_login', 'invalid_user']:
+                key = (event.get('ip', ''), event.get('user', ''))
+                failed_attempts[key].append(event)
+        
+        # Check for >20 failures over >30 minutes (slow attack)
+        for (ip, user), attempts in failed_attempts.items():
+            if len(attempts) >= 20:
+                first_time = attempts[0]['timestamp']
+                last_time = attempts[-1]['timestamp']
+                
+                if first_time and last_time:
+                    duration = (last_time - first_time).total_seconds() / 60
+                    
+                    # Slow brute force: many attempts over long period
+                    if duration > 30:
+                        self.anomalies.append({
+                            'type': 'slow_brute_force',
+                            'severity': 'MEDIUM',
+                            'ip': ip,
+                            'user': user,
+                            'attempts': len(attempts),
+                            'duration_minutes': round(duration, 2),
+                            'description': f"Slow brute force detected: {len(attempts)} failed attempts over {round(duration/60, 1)} hours (evading rate limiting)"
+                        })
+    
+    def _detect_distributed_attack(self, events):
+        """Detect attacks from multiple IPs targeting same user"""
+        user_attacks = defaultdict(lambda: {'ips': set(), 'attempts': []})
+        
+        for event in events:
+            if event['event_type'] in ['failed_login', 'invalid_user']:
+                user = event.get('user', '')
+                ip = event.get('ip', '')
+                user_attacks[user]['ips'].add(ip)
+                user_attacks[user]['attempts'].append(event)
+        
+        for user, data in user_attacks.items():
+            if len(data['ips']) >= 3 and len(data['attempts']) >= 10:
+                self.anomalies.append({
+                    'type': 'distributed_attack',
+                    'severity': 'HIGH',
+                    'user': user,
+                    'source_ips': list(data['ips']),
+                    'total_attempts': len(data['attempts']),
+                    'description': f"Distributed attack: {len(data['attempts'])} attempts on user '{user}' from {len(data['ips'])} different IPs"
                 })
     
     def _detect_successful_breach(self, events):
@@ -221,4 +275,4 @@ class AnomalyAnalyzer:
 
 if __name__ == "__main__":
     print("✅ Anomaly Analyzer loaded successfully!")
-    print("   Detects: Brute force, breaches, privilege escalation, scanning, suspicious commands")
+    print("   Detects: Brute force, slow brute force, distributed attacks, breaches, privilege escalation, scanning, suspicious commands")

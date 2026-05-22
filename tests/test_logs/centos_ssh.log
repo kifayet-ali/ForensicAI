@@ -1,0 +1,4 @@
+Jan 15 10:30:45 centos7 sshd[12345]: Failed password for root from 203.0.113.50 port 45678 ssh2
+Jan 15 10:30:47 centos7 sshd[12345]: Failed password for root from 203.0.113.50 port 45679 ssh2
+Jan 15 10:30:49 centos7 sshd[12345]: Failed password for root from 203.0.113.50 port 45680 ssh2
+Jan 15 10:31:00 centos7 sshd[12345]: Accepted password for root from 203.0.113.50 port 45681 ssh2

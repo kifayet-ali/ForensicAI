@@ -44,3 +44,38 @@ body {
         display: none !important;
     }
 }
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+    
+    .demo-card {
+        margin-bottom: 1rem;
+    }
+    
+    .ai-report {
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+}
+
+/* Better print styles */
+@media print {
+    .navbar, footer, .btn, .demo-card {
+        display: none !important;
+    }
+    
+    .ai-report {
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+}

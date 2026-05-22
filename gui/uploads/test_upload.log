@@ -1,0 +1,5 @@
+Jan 15 10:30:45 server sshd[12345]: Failed password for root from 203.0.113.50 port 45678 ssh2
+Jan 15 10:30:47 server sshd[12345]: Failed password for root from 203.0.113.50 port 45679 ssh2
+Jan 15 10:30:49 server sshd[12345]: Failed password for root from 203.0.113.50 port 45680 ssh2
+Jan 15 10:30:51 server sshd[12345]: Failed password for root from 203.0.113.50 port 45681 ssh2
+Jan 15 10:31:00 server sshd[12345]: Accepted password for root from 203.0.113.50 port 45682 ssh2
