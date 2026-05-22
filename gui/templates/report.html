@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Report - ForensicAI</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        .ai-report {
+            background: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .anomaly-card {
+            transition: transform 0.2s;
+        }
+        .anomaly-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shield-check"></i> ForensicAI
+            </a>
+            <a href="/" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Back to Upload
+            </a>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <!-- File Info Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="fw-bold">
+                    <i class="bi bi-file-earmark-check text-success"></i> Analysis Report
+                </h1>
+                <p class="text-muted">
+                    File: <strong>{{ filename }}</strong> | 
+                    Type: <span class="badge bg-primary">{{ log_type.upper() }}</span>
+                    {% if is_demo %}
+                    | <span class="badge bg-info">DEMO</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-file-text display-4 text-primary"></i>
+                        <h3 class="mt-2">{{ total_events }}</h3>
+                        <p class="text-muted mb-0">Total Events</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
+                        <h3 class="mt-2">{{ anomaly_summary['total_anomalies'] }}</h3>
+                        <p class="text-muted mb-0">Anomalies</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-shield-x display-4 text-danger"></i>
+                        <h3 class="mt-2">{{ anomaly_summary['critical_count'] }}</h3>
+                        <p class="text-muted mb-0">Critical</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        {% if log_type == 'ssh' %}
+                            <i class="bi bi-hdd-network display-4 text-info"></i>
+                            <h3 class="mt-2">{{ stats['unique_ips']|length }}</h3>
+                            <p class="text-muted mb-0">Unique IPs</p>
+                        {% elif log_type == 'web' %}
+                            <i class="bi bi-globe display-4 text-info"></i>
+                            <h3 class="mt-2">{{ stats['total_requests'] }}</h3>
+                            <p class="text-muted mb-0">Requests</p>
+                        {% else %}
+                            <i class="bi bi-terminal display-4 text-info"></i>
+                            <h3 class="mt-2">{{ stats['sudo_commands'] }}</h3>
+                            <p class="text-muted mb-0">Sudo Commands</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Analysis Report -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-robot"></i> AI-Powered Analysis
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="ai-report">{{ ai_report }}</div>
+            </div>
+        </div>
+
+        <!-- Detected Anomalies -->
+        {% if anomalies %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-bug-fill"></i> Detected Anomalies ({{ anomalies|length }})
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for anomaly in anomalies %}
+                    <div class="col-md-6">
+                        <div class="card anomaly-card h-100 border-{{ 'danger' if anomaly.severity == 'CRITICAL' else 'warning' if anomaly.severity == 'HIGH' else 'info' }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">
+                                        {{ severity_levels[anomaly.severity]['icon'] }} {{ anomaly.type|replace('_', ' ')|title }}
+                                    </h6>
+                                    <span class="badge bg-{{ 'danger' if anomaly.severity == 'CRITICAL' else 'warning' if anomaly.severity == 'HIGH' else 'info' }}">
+                                        {{ anomaly.severity }}
+                                    </span>
+                                </div>
+                                <p class="card-text">{{ anomaly.description }}</p>
+                                
+                                <!-- Additional Details -->
+                                <div class="small text-muted">
+                                    {% if anomaly.ip %}
+                                    <div><i class="bi bi-hdd-network"></i> IP: <code>{{ anomaly.ip }}</code></div>
+                                    {% endif %}
+                                    {% if anomaly.user %}
+                                    <div><i class="bi bi-person"></i> User: <code>{{ anomaly.user }}</code></div>
+                                    {% endif %}
+                                    {% if anomaly.attempts %}
+                                    <div><i class="bi bi-arrow-repeat"></i> Attempts: {{ anomaly.attempts }}</div>
+                                    {% endif %}
+                                    {% if anomaly.command %}
+                                    <div><i class="bi bi-terminal"></i> Command: <code>{{ anomaly.command[:80] }}...</code></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Raw Events Sample -->
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-list-ul"></i> Raw Events Sample (First 50)
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td class="text-nowrap">{{ event.raw_timestamp }}</td>
+                                <td><span class="badge bg-secondary">{{ event.event_type }}</span></td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if event.severity == 'CRITICAL' else 'warning' if event.severity == 'HIGH' else 'info' if event.severity == 'MEDIUM' else 'secondary' }}">
+                                        {{ event.severity }}
+                                    </span>
+                                </td>
+                                <td>{{ event.message[:100] }}{% if event.message|length > 100 %}...{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if total_events > 50 %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Showing first 50 of {{ total_events }} events
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col text-center">
+                <a href="/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-upload"></i> Analyze Another Log
+                </a>
+                <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
+                    <i class="bi bi-printer"></i> Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-1">
+                <i class="bi bi-shield-check"></i> ForensicAI - AI-Powered Incident Investigator
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

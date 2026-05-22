@@ -1,0 +1,31 @@
+Jan 15 02:15:43 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52312 ssh2
+Jan 15 02:15:45 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52313 ssh2
+Jan 15 02:15:47 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52314 ssh2
+Jan 15 02:15:49 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52315 ssh2
+Jan 15 02:15:51 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52316 ssh2
+Jan 15 02:15:53 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52317 ssh2
+Jan 15 02:15:55 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52318 ssh2
+Jan 15 02:15:57 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52319 ssh2
+Jan 15 02:15:59 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52320 ssh2
+Jan 15 02:16:01 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52321 ssh2
+Jan 15 02:16:03 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52322 ssh2
+Jan 15 02:16:05 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52323 ssh2
+Jan 15 02:16:07 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52324 ssh2
+Jan 15 02:16:09 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52325 ssh2
+Jan 15 02:16:11 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52326 ssh2
+Jan 15 02:16:13 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52327 ssh2
+Jan 15 02:16:15 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52328 ssh2
+Jan 15 02:16:17 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52329 ssh2
+Jan 15 02:16:19 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52330 ssh2
+Jan 15 02:16:21 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52331 ssh2
+Jan 15 02:16:23 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52332 ssh2
+Jan 15 02:16:25 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52333 ssh2
+Jan 15 02:16:27 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52334 ssh2
+Jan 15 02:16:28 server sshd[1234]: Failed password for admin from 192.168.1.100 port 52335 ssh2
+Jan 15 02:16:30 server sshd[1234]: Accepted password for admin from 192.168.1.100 port 52336 ssh2
+Jan 15 02:16:31 server sshd[1234]: pam_unix(sshd:session): session opened for user admin by (uid=0)
+Jan 15 02:17:00 server sudo: admin : TTY=pts/0 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/su
+Jan 15 02:17:01 server sudo: pam_unix(sudo:session): session opened for user root by admin(uid=0)
+Jan 15 02:18:15 server audit: type=USER_CMD msg='rm -rf /var/log/secure'
+Jan 15 02:18:16 server audit: type=USER_CMD msg='rm -rf /var/log/auth.log'
+Jan 15 02:19:30 server sshd[1234]: Connection closed by 192.168.1.100 port 52336

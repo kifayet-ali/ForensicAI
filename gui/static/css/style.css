@@ -1,0 +1,46 @@
+/* ForensicAI Custom Styles */
+
+:root {
+    --primary-color: #0d6efd;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --success-color: #198754;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 0;
+}
+
+.feature-icon i {
+    font-size: 3rem;
+}
+
+.demo-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.demo-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+/* Print styles */
+@media print {
+    .navbar, footer, .btn {
+        display: none !important;
+    }
+}
