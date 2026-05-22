@@ -1,8 +1,21 @@
+# Python
 __pycache__/
+*.py[cod]
 *.pyc
 venv/
 env/
+
+# Project specific
 uploads/
 reports/
+*.log
+
+# IMPORTANT: Hide config with API key
 config.py
+
+# IDE
 .vscode/
+.idea/
+
+# OS
+.DS_Store
