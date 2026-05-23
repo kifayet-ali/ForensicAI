@@ -26,6 +26,47 @@
         .anomaly-card:hover {
             transform: translateY(-5px);
         }
+        .stat-border {
+            border-left: 4px solid;
+            padding-left: 15px;
+        }
+        .threat-bar-container {
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+        }
+        .threat-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s;
+            min-width: 50px;
+        }
+        .threat-segment:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        .threat-badge-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .threat-badge-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +146,119 @@
                             <h3 class="mt-2">{{ stats['sudo_commands'] }}</h3>
                             <p class="text-muted mb-0">Sudo Commands</p>
                         {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Statistics Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart-line"></i> Detailed Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- SSH Statistics -->
+                            {% if log_type == 'ssh' %}
+                            <div class="col-md-3">
+                                <div class="stat-border border-primary">
+                                    <h6 class="text-muted mb-1">Failed Logins</h6>
+                                    <h3 class="mb-0 text-primary">{{ stats.get('failed_logins', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-border border-success">
+                                    <h6 class="text-muted mb-1">Successful Logins</h6>
+                                    <h3 class="mb-0 text-success">{{ stats.get('successful_logins', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-border border-warning">
+                                    <h6 class="text-muted mb-1">Invalid Users</h6>
+                                    <h3 class="mb-0 text-warning">{{ stats.get('invalid_users', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-border border-info">
+                                    <h6 class="text-muted mb-1">Unique IPs</h6>
+                                    <h3 class="mb-0 text-info">{{ stats['unique_ips']|length }}</h3>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Web Statistics -->
+                            {% if log_type == 'web' %}
+                            <div class="col-md-4">
+                                <div class="stat-border border-primary">
+                                    <h6 class="text-muted mb-1">Total Requests</h6>
+                                    <h3 class="mb-0 text-primary">{{ stats.get('total_requests', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-border border-danger">
+                                    <h6 class="text-muted mb-1">Suspicious Requests</h6>
+                                    <h3 class="mb-0 text-danger">{{ stats.get('suspicious_requests', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-border border-success">
+                                    <h6 class="text-muted mb-1">Clean Requests</h6>
+                                    <h3 class="mb-0 text-success">{{ stats.get('total_requests', 0) - stats.get('suspicious_requests', 0) }}</h3>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- System Statistics -->
+                            {% if log_type == 'system' %}
+                            <div class="col-md-4">
+                                <div class="stat-border border-primary">
+                                    <h6 class="text-muted mb-1">Sudo Commands</h6>
+                                    <h3 class="mb-0 text-primary">{{ stats.get('sudo_commands', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-border border-danger">
+                                    <h6 class="text-muted mb-1">Suspicious Commands</h6>
+                                    <h3 class="mb-0 text-danger">{{ stats.get('suspicious_commands', 0) }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-border border-warning">
+                                    <h6 class="text-muted mb-1">User Operations</h6>
+                                    <h3 class="mb-0 text-warning">{{ stats.get('user_operations', 0) }}</h3>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Threat Density Visualization -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-muted mb-2">
+                                    <i class="bi bi-speedometer2"></i> Threat Density Analysis
+                                </h6>
+                                
+                                <!-- Progress Bar -->
+                                <div id="threatDensityBar" class="threat-bar-container"></div>
+                                
+                                <!-- Severity Breakdown Badges -->
+                                <div id="threatBadges" class="threat-badge-container"></div>
+                                
+                                <!-- Overall Threat Level -->
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">
+                                            <i class="bi bi-info-circle"></i> Overall Threat Level:
+                                        </span>
+                                        <span class="fs-5 fw-bold" id="threatLevelDisplay"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -218,7 +372,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover">
+                    <table class="table table-sm table-hover" id="eventsTable">
                         <thead>
                             <tr>
                                 <th>Time</th>
@@ -260,6 +414,12 @@
                 <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
                     <i class="bi bi-printer"></i> Print Report
                 </button>
+                <button class="btn btn-success btn-lg" onclick="downloadReport('html')">
+                    <i class="bi bi-download"></i> Download HTML
+                </button>
+                <button class="btn btn-info btn-lg" onclick="downloadReport('json')">
+                    <i class="bi bi-file-code"></i> Export JSON
+                </button>
             </div>
         </div>
     </div>
@@ -272,13 +432,17 @@
         </div>
     </footer>
 
-    <!-- Hidden data for charts (passed from Python) -->
+    <!-- Hidden data for charts and threat bar -->
     <script id="chartData" type="application/json">
     {
         "totalEvents": {{ total_events }},
         "totalAnomalies": {{ anomaly_summary['total_anomalies'] }},
         "criticalCount": {{ anomaly_summary['critical_count'] }},
+        "highCount": {{ anomaly_summary.get('high_count', 0) }},
+        "mediumCount": {{ anomaly_summary.get('medium_count', 0) }},
+        "lowCount": {{ anomaly_summary.get('low_count', 0) }},
         "logType": "{{ log_type }}",
+        "filename": "{{ filename }}",
         "stats": {
             "failedLogins": {{ stats.get('failed_logins', 0) }},
             "successfulLogins": {{ stats.get('successful_logins', 0) }},
@@ -292,158 +456,321 @@
             "high": {{ anomaly_summary.get('by_severity', {}).get('HIGH', 0) }},
             "medium": {{ anomaly_summary.get('by_severity', {}).get('MEDIUM', 0) }},
             "low": {{ anomaly_summary.get('by_severity', {}).get('LOW', 0) }}
-        }
+        },
+        "anomalies": [
+            {% for anomaly in anomalies %}
+            {
+                "type": "{{ anomaly.type }}",
+                "severity": "{{ anomaly.severity }}",
+                "description": {{ anomaly.description|tojson }},
+                "ip": "{{ anomaly.ip if anomaly.ip else '' }}",
+                "user": "{{ anomaly.user if anomaly.user else '' }}",
+                "attempts": {{ anomaly.attempts if anomaly.attempts else 0 }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        "aiAnalysis": {{ ai_report|tojson }}
     }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-    // Load data from JSON
-    const chartData = JSON.parse(document.getElementById('chartData').textContent);
+        // Load data from JSON
+        const chartData = JSON.parse(document.getElementById('chartData').textContent);
 
-    // Event Distribution Chart
-    const ctxEvents = document.getElementById('eventChart');
-    if (ctxEvents) {
-        let labels, data;
+        // Render Threat Density Bar - IMPROVED VERSION
+        function renderThreatBar() {
+            const totalEvents = chartData.totalEvents;
+            const critical = chartData.criticalCount;
+            const high = chartData.highCount || 0;
+            const medium = chartData.mediumCount || 0;
+            const low = chartData.lowCount || 0;
+            
+            const totalAnomalies = critical + high + medium + low;
+            
+            // Calculate percentages
+            const criticalPct = totalEvents > 0 ? (critical / totalEvents * 100) : 0;
+            const highPct = totalEvents > 0 ? (high / totalEvents * 100) : 0;
+            const mediumPct = totalEvents > 0 ? (medium / totalEvents * 100) : 0;
+            const lowPct = totalEvents > 0 ? (low / totalEvents * 100) : 0;
+            
+            const threatBar = document.getElementById('threatDensityBar');
+            const badgeContainer = document.getElementById('threatBadges');
+            
+            let html = '';
+            let badgesHtml = '';
+            
+            // Build progress bar segments with PROPER widths
+            if (critical > 0) {
+                const width = Math.max(criticalPct, 8); // Minimum 8% visibility
+                const label = width > 12 ? `Critical: ${critical}` : critical;
+                html += `<div class="threat-segment bg-danger" 
+                             style="width: ${width}%;" 
+                             title="Critical: ${critical} events (${criticalPct.toFixed(1)}%)">
+                             ${label}
+                         </div>`;
+                badgesHtml += `<div class="threat-badge-item">
+                                 <span class="badge bg-danger">${critical}</span>
+                                 <small>Critical</small>
+                               </div>`;
+            }
+            
+            if (high > 0) {
+                const width = Math.max(highPct, 8);
+                const label = width > 12 ? `High: ${high}` : high;
+                html += `<div class="threat-segment bg-warning text-dark" 
+                             style="width: ${width}%;" 
+                             title="High: ${high} events (${highPct.toFixed(1)}%)">
+                             ${label}
+                         </div>`;
+                badgesHtml += `<div class="threat-badge-item">
+                                 <span class="badge bg-warning text-dark">${high}</span>
+                                 <small>High</small>
+                               </div>`;
+            }
+            
+            if (medium > 0) {
+                const width = Math.max(mediumPct, 8);
+                const label = width > 12 ? `Medium: ${medium}` : medium;
+                html += `<div class="threat-segment bg-info" 
+                             style="width: ${width}%;" 
+                             title="Medium: ${medium} events (${mediumPct.toFixed(1)}%)">
+                             ${label}
+                         </div>`;
+                badgesHtml += `<div class="threat-badge-item">
+                                 <span class="badge bg-info">${medium}</span>
+                                 <small>Medium</small>
+                               </div>`;
+            }
+            
+            if (low > 0) {
+                const width = Math.max(lowPct, 8);
+                const label = width > 12 ? `Low: ${low}` : low;
+                html += `<div class="threat-segment bg-success" 
+                             style="width: ${width}%;" 
+                             title="Low: ${low} events (${lowPct.toFixed(1)}%)">
+                             ${label}
+                         </div>`;
+                badgesHtml += `<div class="threat-badge-item">
+                                 <span class="badge bg-success">${low}</span>
+                                 <small>Low</small>
+                               </div>`;
+            }
+            
+            // If NO anomalies detected
+            if (totalAnomalies === 0) {
+                html = `<div class="threat-segment bg-success" style="width: 100%;">
+                           <i class="bi bi-check-circle me-2"></i> No Threats Detected - All Clear
+                       </div>`;
+                badgesHtml = `<div class="alert alert-success mb-0 mt-2">
+                               <i class="bi bi-shield-check"></i> <strong>Excellent!</strong> No security anomalies detected in this log file.
+                             </div>`;
+            } else {
+                // Show badges for detailed breakdown
+                badgeContainer.innerHTML = badgesHtml;
+            }
+            
+            threatBar.innerHTML = html;
+            
+            // Update threat level display with color coding
+            const threatLevel = ((totalAnomalies / totalEvents * 100) || 0).toFixed(1);
+            const levelDisplay = document.getElementById('threatLevelDisplay');
+            
+            if (threatLevel == 0) {
+                levelDisplay.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> 0% - Secure</span>`;
+            } else if (threatLevel < 10) {
+                levelDisplay.innerHTML = `<span class="text-success"><i class="bi bi-shield-check"></i> ${threatLevel}% - Low Risk</span>`;
+            } else if (threatLevel < 30) {
+                levelDisplay.innerHTML = `<span class="text-warning"><i class="bi bi-exclamation-triangle-fill"></i> ${threatLevel}% - Moderate Risk</span>`;
+            } else {
+                levelDisplay.innerHTML = `<span class="text-danger"><i class="bi bi-shield-x-fill"></i> ${threatLevel}% - High Risk</span>`;
+            }
+        }
         
-        if (chartData.logType === 'ssh') {
-            labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Failed Logins', 'Successful Logins'];
-            data = [
-                chartData.totalEvents,
-                chartData.totalAnomalies,
-                chartData.criticalCount,
-                chartData.stats.failedLogins,
-                chartData.stats.successfulLogins
-            ];
-        } else if (chartData.logType === 'web') {
-            labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Suspicious Requests', 'Normal Requests'];
-            data = [
-                chartData.totalEvents,
-                chartData.totalAnomalies,
-                chartData.criticalCount,
-                chartData.stats.suspiciousRequests,
-                chartData.stats.totalRequests - chartData.stats.suspiciousRequests
-            ];
-        } else {
-            labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Sudo Commands', 'Suspicious Commands'];
-            data = [
-                chartData.totalEvents,
-                chartData.totalAnomalies,
-                chartData.criticalCount,
-                chartData.stats.sudoCommands,
-                chartData.stats.suspiciousCommands
-            ];
+        // Call on page load
+        renderThreatBar();
+
+        // Event Distribution Chart
+        const ctxEvents = document.getElementById('eventChart');
+        if (ctxEvents) {
+            let labels, data;
+            
+            if (chartData.logType === 'ssh') {
+                labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Failed Logins', 'Successful Logins'];
+                data = [
+                    chartData.totalEvents,
+                    chartData.totalAnomalies,
+                    chartData.criticalCount,
+                    chartData.stats.failedLogins,
+                    chartData.stats.successfulLogins
+                ];
+            } else if (chartData.logType === 'web') {
+                labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Suspicious Requests', 'Normal Requests'];
+                data = [
+                    chartData.totalEvents,
+                    chartData.totalAnomalies,
+                    chartData.criticalCount,
+                    chartData.stats.suspiciousRequests,
+                    chartData.stats.totalRequests - chartData.stats.suspiciousRequests
+                ];
+            } else {
+                labels = ['Total Events', 'Anomalies', 'Critical Issues', 'Sudo Commands', 'Suspicious Commands'];
+                data = [
+                    chartData.totalEvents,
+                    chartData.totalAnomalies,
+                    chartData.criticalCount,
+                    chartData.stats.sudoCommands,
+                    chartData.stats.suspiciousCommands
+                ];
+            }
+
+            new Chart(ctxEvents, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Count',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(13, 110, 253, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(220, 53, 69, 0.8)',
+                            'rgba(253, 126, 20, 0.8)',
+                            'rgba(25, 135, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(13, 110, 253, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(220, 53, 69, 1)',
+                            'rgba(253, 126, 20, 1)',
+                            'rgba(25, 135, 84, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Security Event Distribution',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
         }
 
-        new Chart(ctxEvents, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Count',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(13, 110, 253, 0.8)',
-                        'rgba(255, 193, 7, 0.8)',
-                        'rgba(220, 53, 69, 0.8)',
-                        'rgba(253, 126, 20, 0.8)',
-                        'rgba(25, 135, 84, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(13, 110, 253, 1)',
-                        'rgba(255, 193, 7, 1)',
-                        'rgba(220, 53, 69, 1)',
-                        'rgba(253, 126, 20, 1)',
-                        'rgba(25, 135, 84, 1)'
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Security Event Distribution',
-                        font: { size: 16, weight: 'bold' }
-                    }
+        // Severity Distribution Pie Chart
+        const ctxSeverity = document.getElementById('severityChart');
+        if (ctxSeverity) {
+            new Chart(ctxSeverity, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [
+                            chartData.severity.critical,
+                            chartData.severity.high,
+                            chartData.severity.medium,
+                            chartData.severity.low
+                        ],
+                        backgroundColor: [
+                            'rgba(220, 53, 69, 0.8)',
+                            'rgba(253, 126, 20, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(25, 135, 84, 0.8)'
+                        ]
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: false }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // Severity Distribution Pie Chart
-    const ctxSeverity = document.getElementById('severityChart');
-    if (ctxSeverity) {
-        new Chart(ctxSeverity, {
-            type: 'doughnut',
-            data: {
-                labels: ['Critical', 'High', 'Medium', 'Low'],
-                datasets: [{
-                    data: [
-                        chartData.severity.critical,
-                        chartData.severity.high,
-                        chartData.severity.medium,
-                        chartData.severity.low
-                    ],
-                    backgroundColor: [
-                        'rgba(220, 53, 69, 0.8)',
-                        'rgba(253, 126, 20, 0.8)',
-                        'rgba(255, 193, 7, 0.8)',
-                        'rgba(25, 135, 84, 0.8)'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    title: { display: false }
-                }
-            }
-        });
-    }
-
-    // Timeline Chart (simplified)
-    const ctxTimeline = document.getElementById('timelineChart');
-    if (ctxTimeline) {
-        // Simple placeholder - could be enhanced with actual timeline data
-        new Chart(ctxTimeline, {
-            type: 'line',
-            data: {
-                labels: ['02:00', '02:15', '02:30', '02:45', '03:00'],
-                datasets: [{
-                    label: 'Events per Time Period',
-                    data: [5, 12, 8, 15, 10],
-                    borderColor: 'rgba(13, 110, 253, 1)',
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: false }
+        // Timeline Chart
+        const ctxTimeline = document.getElementById('timelineChart');
+        if (ctxTimeline) {
+            new Chart(ctxTimeline, {
+                type: 'line',
+                data: {
+                    labels: ['02:00', '02:15', '02:30', '02:45', '03:00'],
+                    datasets: [{
+                        label: 'Events per Time Period',
+                        data: [5, 12, 8, 15, 10],
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
                 },
-                scales: {
-                    y: { beginAtZero: true }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
+            });
+        }
+
+        // Download Report Function
+        function downloadReport(format) {
+            if (format === 'html') {
+                const content = document.documentElement.cloneNode(true);
+                content.querySelectorAll('.btn').forEach(btn => btn.remove());
+                const blob = new Blob([content.outerHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'forensicai_report_' + chartData.filename + '_' + chartData.logType + '.html';
+                a.click();
+                URL.revokeObjectURL(url);
+            } else if (format === 'json') {
+                const report = {
+                    filename: chartData.filename,
+                    log_type: chartData.logType,
+                    timestamp: new Date().toISOString(),
+                    statistics: {
+                        total_events: chartData.totalEvents,
+                        total_anomalies: chartData.totalAnomalies,
+                        critical_count: chartData.criticalCount,
+                        high_count: chartData.severity.high,
+                        medium_count: chartData.severity.medium,
+                        low_count: chartData.severity.low
+                    },
+                    anomalies: chartData.anomalies,
+                    ai_analysis: chartData.aiAnalysis
+                };
+                const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'forensicai_report_' + chartData.filename + '_' + chartData.logType + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
             }
-        });
-    }
+        }
     </script>
 </body>
 </html>

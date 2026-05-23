@@ -173,7 +173,16 @@ def demo(log_name):
     except Exception as e:
         flash(f'Error loading demo: {str(e)}', 'danger')
         return redirect(url_for('index'))
+@app.errorhandler(404)
+def page_not_found(e):
+    """Handle 404 errors"""
+    return render_template('404.html'), 404
 
+@app.errorhandler(500)
+def internal_error(e):
+    """Handle 500 errors"""
+    flash('An internal error occurred. Please try again.', 'danger')
+    return redirect(url_for('index'))
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("🔍 FORENSICAI - AI-POWERED INCIDENT INVESTIGATOR")
