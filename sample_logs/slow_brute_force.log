@@ -20,4 +20,3 @@ Jan 15 02:54:00 server sshd[1234]: Failed password for admin from 192.168.1.100 
 Jan 15 02:57:00 server sshd[1234]: Failed password for admin from 192.168.1.100 port 5019 ssh2
 Jan 15 03:00:00 server sshd[1234]: Failed password for admin from 192.168.1.100 port 5020 ssh2
 Jan 15 03:03:00 server sshd[1234]: Accepted password for admin from 192.168.1.100 port 5021 ssh2
-Jan 15 03:04:00 server sshd[1234]: pam_unix(sshd:session): session opened for user admin by (uid=0)

@@ -122,9 +122,10 @@ def demo(log_name):
     """Quick demo with pre-loaded logs"""
     
     demo_files = {
-    'brute_force': ('../sample_logs/brute_force_attack.log', 'ssh'),
-    'slow_attack': ('../sample_logs/slow_brute_force.log', 'ssh'),
-}
+        'brute_force': ('../sample_logs/brute_force_attack.log', 'ssh'),
+        'slow_attack': ('../sample_logs/slow_brute_force.log', 'ssh'),
+        'web_scan': ('../sample_logs/web_scanning.log', 'web'),
+    }
     
     if log_name not in demo_files:
         flash('Demo log not found!', 'danger')
